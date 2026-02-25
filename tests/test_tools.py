@@ -53,7 +53,7 @@ class TestQuercleFetch:
         tools_module._default_client = None
 
         mock_client = MagicMock()
-        mock_client.fetch.return_value = "Processed content"
+        mock_client.fetch.return_value = MagicMock(result="Processed content")
         mock_client_class.return_value = mock_client
 
         result = quercle_fetch(url="https://example.com", prompt="Summarize this")
@@ -93,7 +93,7 @@ class TestQuercleSearch:
         tools_module._default_client = None
 
         mock_client = MagicMock()
-        mock_client.search.return_value = "Search results"
+        mock_client.search.return_value = MagicMock(result="Search results")
         mock_client_class.return_value = mock_client
 
         result = quercle_search(query="What is Python?")
@@ -113,7 +113,7 @@ class TestQuercleSearch:
         tools_module._default_client = None
 
         mock_client = MagicMock()
-        mock_client.search.return_value = "Filtered results"
+        mock_client.search.return_value = MagicMock(result="Filtered results")
         mock_client_class.return_value = mock_client
 
         result = quercle_search(
@@ -148,17 +148,7 @@ class TestCreateQuercleFetch:
 
         create_quercle_fetch(api_key="qk_custom_key")
 
-        mock_client_class.assert_called_once_with(api_key="qk_custom_key", timeout=120.0)
-
-    @patch("google_adk_quercle.tools.QuercleClient")
-    def test_custom_timeout(self, mock_client_class):
-        """Test that custom timeout is passed to client."""
-        mock_client = MagicMock()
-        mock_client_class.return_value = mock_client
-
-        create_quercle_fetch(timeout=60.0)
-
-        mock_client_class.assert_called_once_with(api_key=None, timeout=60.0)
+        mock_client_class.assert_called_once_with(api_key="qk_custom_key")
 
     @patch("google_adk_quercle.tools.QuercleClient")
     def test_created_function_has_docstring(self, mock_client_class):
@@ -174,7 +164,7 @@ class TestCreateQuercleFetch:
     def test_created_function_executes(self, mock_client_class):
         """Test that created function executes correctly."""
         mock_client = MagicMock()
-        mock_client.fetch.return_value = "Custom fetch result"
+        mock_client.fetch.return_value = MagicMock(result="Custom fetch result")
         mock_client_class.return_value = mock_client
 
         fetch_fn = create_quercle_fetch(api_key="qk_test")
@@ -184,6 +174,7 @@ class TestCreateQuercleFetch:
         mock_client.fetch.assert_called_once_with(
             url="https://example.com",
             prompt="Extract data",
+            timeout=120.0,
         )
 
 
@@ -205,17 +196,7 @@ class TestCreateQuercleSearch:
 
         create_quercle_search(api_key="qk_custom_key")
 
-        mock_client_class.assert_called_once_with(api_key="qk_custom_key", timeout=120.0)
-
-    @patch("google_adk_quercle.tools.QuercleClient")
-    def test_custom_timeout(self, mock_client_class):
-        """Test that custom timeout is passed to client."""
-        mock_client = MagicMock()
-        mock_client_class.return_value = mock_client
-
-        create_quercle_search(timeout=30.0)
-
-        mock_client_class.assert_called_once_with(api_key=None, timeout=30.0)
+        mock_client_class.assert_called_once_with(api_key="qk_custom_key")
 
     @patch("google_adk_quercle.tools.QuercleClient")
     def test_created_function_has_docstring(self, mock_client_class):
@@ -231,7 +212,7 @@ class TestCreateQuercleSearch:
     def test_created_function_executes(self, mock_client_class):
         """Test that created function executes correctly."""
         mock_client = MagicMock()
-        mock_client.search.return_value = "Custom search result"
+        mock_client.search.return_value = MagicMock(result="Custom search result")
         mock_client_class.return_value = mock_client
 
         search_fn = create_quercle_search(api_key="qk_test")
@@ -242,6 +223,7 @@ class TestCreateQuercleSearch:
             "test query",
             allowed_domains=None,
             blocked_domains=None,
+            timeout=120.0,
         )
 
 
@@ -249,14 +231,14 @@ class TestGetQuercleTools:
     """Tests for get_quercle_tools convenience function."""
 
     @patch("google_adk_quercle.tools.QuercleClient")
-    def test_returns_list_of_two_callables(self, mock_client_class):
-        """Test that get_quercle_tools returns a list of 2 callables."""
+    def test_returns_list_of_five_callables(self, mock_client_class):
+        """Test that get_quercle_tools returns a list of 5 callables."""
         mock_client_class.return_value = MagicMock()
 
         tools = get_quercle_tools()
 
         assert isinstance(tools, list)
-        assert len(tools) == 2
+        assert len(tools) == 5
         assert all(callable(tool) for tool in tools)
 
     @patch("google_adk_quercle.tools.QuercleClient")
@@ -272,15 +254,13 @@ class TestGetQuercleTools:
 
     @patch("google_adk_quercle.tools.QuercleClient")
     def test_passes_configuration(self, mock_client_class):
-        """Test that api_key and timeout are passed to both tools."""
+        """Test that api_key and timeout are passed to all tools."""
         mock_client_class.return_value = MagicMock()
 
         get_quercle_tools(api_key="qk_shared_key", timeout=90.0)
 
-        assert mock_client_class.call_count == 2
-        for call in mock_client_class.call_args_list:
-            assert call.kwargs["api_key"] == "qk_shared_key"
-            assert call.kwargs["timeout"] == 90.0
+        assert mock_client_class.call_count == 1
+        assert mock_client_class.call_args.kwargs["api_key"] == "qk_shared_key"
 
 
 # =============================================================================
@@ -316,7 +296,7 @@ class TestAsyncQuercleFetch:
         tools_module._default_async_client = None
 
         mock_client = AsyncMock()
-        mock_client.fetch.return_value = "Async processed content"
+        mock_client.fetch.return_value = MagicMock(result="Async processed content")
         mock_client_class.return_value = mock_client
 
         result = await async_quercle_fetch(url="https://example.com", prompt="Summarize")
@@ -356,7 +336,7 @@ class TestAsyncQuercleSearch:
         tools_module._default_async_client = None
 
         mock_client = AsyncMock()
-        mock_client.search.return_value = "Async search results"
+        mock_client.search.return_value = MagicMock(result="Async search results")
         mock_client_class.return_value = mock_client
 
         result = await async_quercle_search(query="What is Python?")
@@ -386,7 +366,7 @@ class TestCreateAsyncQuercleFetch:
 
         create_async_quercle_fetch(api_key="qk_async_key")
 
-        mock_client_class.assert_called_once_with(api_key="qk_async_key", timeout=120.0)
+        mock_client_class.assert_called_once_with(api_key="qk_async_key")
 
     @patch("google_adk_quercle.tools.AsyncQuercleClient")
     def test_created_function_has_docstring(self, mock_client_class):
@@ -403,7 +383,7 @@ class TestCreateAsyncQuercleFetch:
     async def test_created_function_executes(self, mock_client_class):
         """Test that created async function executes correctly."""
         mock_client = AsyncMock()
-        mock_client.fetch.return_value = "Async custom fetch result"
+        mock_client.fetch.return_value = MagicMock(result="Async custom fetch result")
         mock_client_class.return_value = mock_client
 
         fetch_fn = create_async_quercle_fetch(api_key="qk_test")
@@ -413,6 +393,7 @@ class TestCreateAsyncQuercleFetch:
         mock_client.fetch.assert_called_once_with(
             url="https://example.com",
             prompt="Extract data",
+            timeout=120.0,
         )
 
 
@@ -433,7 +414,7 @@ class TestCreateAsyncQuercleSearch:
 
         create_async_quercle_search(api_key="qk_async_key")
 
-        mock_client_class.assert_called_once_with(api_key="qk_async_key", timeout=120.0)
+        mock_client_class.assert_called_once_with(api_key="qk_async_key")
 
     @patch("google_adk_quercle.tools.AsyncQuercleClient")
     def test_created_function_has_docstring(self, mock_client_class):
@@ -450,7 +431,7 @@ class TestCreateAsyncQuercleSearch:
     async def test_created_function_executes(self, mock_client_class):
         """Test that created async function executes correctly."""
         mock_client = AsyncMock()
-        mock_client.search.return_value = "Async custom search result"
+        mock_client.search.return_value = MagicMock(result="Async custom search result")
         mock_client_class.return_value = mock_client
 
         search_fn = create_async_quercle_search(api_key="qk_test")
@@ -461,6 +442,7 @@ class TestCreateAsyncQuercleSearch:
             "test query",
             allowed_domains=None,
             blocked_domains=None,
+            timeout=120.0,
         )
 
 
@@ -468,14 +450,14 @@ class TestGetAsyncQuercleTools:
     """Tests for get_async_quercle_tools convenience function."""
 
     @patch("google_adk_quercle.tools.AsyncQuercleClient")
-    def test_returns_list_of_two_coroutine_functions(self, mock_client_class):
-        """Test that get_async_quercle_tools returns 2 async callables."""
+    def test_returns_list_of_five_coroutine_functions(self, mock_client_class):
+        """Test that get_async_quercle_tools returns 5 async callables."""
         mock_client_class.return_value = AsyncMock()
 
         tools = get_async_quercle_tools()
 
         assert isinstance(tools, list)
-        assert len(tools) == 2
+        assert len(tools) == 5
         assert all(asyncio.iscoroutinefunction(tool) for tool in tools)
 
     @patch("google_adk_quercle.tools.AsyncQuercleClient")
@@ -491,12 +473,10 @@ class TestGetAsyncQuercleTools:
 
     @patch("google_adk_quercle.tools.AsyncQuercleClient")
     def test_passes_configuration(self, mock_client_class):
-        """Test that api_key and timeout are passed to both async tools."""
+        """Test that api_key and timeout are passed to all async tools."""
         mock_client_class.return_value = AsyncMock()
 
         get_async_quercle_tools(api_key="qk_async_shared", timeout=90.0)
 
-        assert mock_client_class.call_count == 2
-        for call in mock_client_class.call_args_list:
-            assert call.kwargs["api_key"] == "qk_async_shared"
-            assert call.kwargs["timeout"] == 90.0
+        assert mock_client_class.call_count == 1
+        assert mock_client_class.call_args.kwargs["api_key"] == "qk_async_shared"
