@@ -10,6 +10,7 @@ from quercle import (
     QuercleClient,
     tool_metadata,
 )
+from quercle.models import ExtractBodyFormat, RawFetchBodyFormat, RawSearchBodyFormat
 
 # Build docstrings from quercle SDK descriptions (DRY)
 _FETCH_DOCSTRING = f"""{tool_metadata["fetch"]["description"]}
@@ -122,7 +123,7 @@ quercle_search.__doc__ = _SEARCH_DOCSTRING
 
 def quercle_raw_fetch(
     url: str,
-    format: str | None = None,
+    format: RawFetchBodyFormat | None = None,
     use_safeguard: bool | None = None,
 ) -> str:
     return _format_result(
@@ -135,7 +136,7 @@ quercle_raw_fetch.__doc__ = _RAW_FETCH_DOCSTRING
 
 def quercle_raw_search(
     query: str,
-    format: str | None = None,
+    format: RawSearchBodyFormat | None = None,
     use_safeguard: bool | None = None,
 ) -> str:
     return _format_result(
@@ -149,7 +150,7 @@ quercle_raw_search.__doc__ = _RAW_SEARCH_DOCSTRING
 def quercle_extract(
     url: str,
     query: str,
-    format: str | None = None,
+    format: ExtractBodyFormat | None = None,
     use_safeguard: bool | None = None,
 ) -> str:
     return _format_result(
@@ -189,7 +190,7 @@ async_quercle_search.__doc__ = _SEARCH_DOCSTRING
 
 async def async_quercle_raw_fetch(
     url: str,
-    format: str | None = None,
+    format: RawFetchBodyFormat | None = None,
     use_safeguard: bool | None = None,
 ) -> str:
     return _format_result(
@@ -202,7 +203,7 @@ async_quercle_raw_fetch.__doc__ = _RAW_FETCH_DOCSTRING
 
 async def async_quercle_raw_search(
     query: str,
-    format: str | None = None,
+    format: RawSearchBodyFormat | None = None,
     use_safeguard: bool | None = None,
 ) -> str:
     return _format_result(
@@ -218,7 +219,7 @@ async_quercle_raw_search.__doc__ = _RAW_SEARCH_DOCSTRING
 async def async_quercle_extract(
     url: str,
     query: str,
-    format: str | None = None,
+    format: ExtractBodyFormat | None = None,
     use_safeguard: bool | None = None,
 ) -> str:
     return _format_result(
@@ -298,7 +299,7 @@ def create_quercle_search(
 def create_quercle_raw_fetch(
     api_key: str | None = None,
     timeout: float = 120.0,
-) -> Callable[[str, str | None, bool | None], str]:
+) -> Callable[[str, RawFetchBodyFormat | None, bool | None], str]:
     """Create a quercle_raw_fetch tool with custom configuration.
 
     Use this factory function when you need to customize the API key or timeout
@@ -315,7 +316,7 @@ def create_quercle_raw_fetch(
 
     def quercle_raw_fetch(
         url: str,
-        format: str | None = None,
+        format: RawFetchBodyFormat | None = None,
         use_safeguard: bool | None = None,
     ) -> str:
         return _format_result(
@@ -329,7 +330,7 @@ def create_quercle_raw_fetch(
 def create_quercle_raw_search(
     api_key: str | None = None,
     timeout: float = 120.0,
-) -> Callable[[str, str | None, bool | None], str]:
+) -> Callable[[str, RawSearchBodyFormat | None, bool | None], str]:
     """Create a quercle_raw_search tool with custom configuration.
 
     Use this factory function when you need to customize the API key or timeout
@@ -346,7 +347,7 @@ def create_quercle_raw_search(
 
     def quercle_raw_search(
         query: str,
-        format: str | None = None,
+        format: RawSearchBodyFormat | None = None,
         use_safeguard: bool | None = None,
     ) -> str:
         return _format_result(
@@ -360,7 +361,7 @@ def create_quercle_raw_search(
 def create_quercle_extract(
     api_key: str | None = None,
     timeout: float = 120.0,
-) -> Callable[[str, str, str | None, bool | None], str]:
+) -> Callable[[str, str, ExtractBodyFormat | None, bool | None], str]:
     """Create a quercle_extract tool with custom configuration.
 
     Use this factory function when you need to customize the API key or timeout
@@ -378,7 +379,7 @@ def create_quercle_extract(
     def quercle_extract(
         url: str,
         query: str,
-        format: str | None = None,
+        format: ExtractBodyFormat | None = None,
         use_safeguard: bool | None = None,
     ) -> str:
         return _format_result(
@@ -424,7 +425,7 @@ def get_quercle_tools(
 
     def _raw_fetch(
         url: str,
-        format: str | None = None,
+        format: RawFetchBodyFormat | None = None,
         use_safeguard: bool | None = None,
     ) -> str:
         return _format_result(
@@ -436,7 +437,7 @@ def get_quercle_tools(
 
     def _raw_search(
         query: str,
-        format: str | None = None,
+        format: RawSearchBodyFormat | None = None,
         use_safeguard: bool | None = None,
     ) -> str:
         return _format_result(
@@ -449,7 +450,7 @@ def get_quercle_tools(
     def _extract(
         url: str,
         query: str,
-        format: str | None = None,
+        format: ExtractBodyFormat | None = None,
         use_safeguard: bool | None = None,
     ) -> str:
         return _format_result(
@@ -535,7 +536,7 @@ def create_async_quercle_search(
 def create_async_quercle_raw_fetch(
     api_key: str | None = None,
     timeout: float = 120.0,
-) -> Callable[[str, str | None, bool | None], Coroutine[None, None, str]]:
+) -> Callable[[str, RawFetchBodyFormat | None, bool | None], Coroutine[None, None, str]]:
     """Create an async quercle_raw_fetch tool with custom configuration.
 
     Use this factory function when you need to customize the API key or timeout
@@ -552,7 +553,7 @@ def create_async_quercle_raw_fetch(
 
     async def async_quercle_raw_fetch(
         url: str,
-        format: str | None = None,
+        format: RawFetchBodyFormat | None = None,
         use_safeguard: bool | None = None,
     ) -> str:
         return _format_result(
@@ -566,7 +567,7 @@ def create_async_quercle_raw_fetch(
 def create_async_quercle_raw_search(
     api_key: str | None = None,
     timeout: float = 120.0,
-) -> Callable[[str, str | None, bool | None], Coroutine[None, None, str]]:
+) -> Callable[[str, RawSearchBodyFormat | None, bool | None], Coroutine[None, None, str]]:
     """Create an async quercle_raw_search tool with custom configuration.
 
     Use this factory function when you need to customize the API key or timeout
@@ -583,7 +584,7 @@ def create_async_quercle_raw_search(
 
     async def async_quercle_raw_search(
         query: str,
-        format: str | None = None,
+        format: RawSearchBodyFormat | None = None,
         use_safeguard: bool | None = None,
     ) -> str:
         return _format_result(
@@ -600,7 +601,7 @@ def create_async_quercle_raw_search(
 def create_async_quercle_extract(
     api_key: str | None = None,
     timeout: float = 120.0,
-) -> Callable[[str, str, str | None, bool | None], Coroutine[None, None, str]]:
+) -> Callable[[str, str, ExtractBodyFormat | None, bool | None], Coroutine[None, None, str]]:
     """Create an async quercle_extract tool with custom configuration.
 
     Use this factory function when you need to customize the API key or timeout
@@ -618,7 +619,7 @@ def create_async_quercle_extract(
     async def async_quercle_extract(
         url: str,
         query: str,
-        format: str | None = None,
+        format: ExtractBodyFormat | None = None,
         use_safeguard: bool | None = None,
     ) -> str:
         return _format_result(
@@ -670,7 +671,7 @@ def get_async_quercle_tools(
 
     async def _raw_fetch(
         url: str,
-        format: str | None = None,
+        format: RawFetchBodyFormat | None = None,
         use_safeguard: bool | None = None,
     ) -> str:
         return _format_result(
@@ -682,7 +683,7 @@ def get_async_quercle_tools(
 
     async def _raw_search(
         query: str,
-        format: str | None = None,
+        format: RawSearchBodyFormat | None = None,
         use_safeguard: bool | None = None,
     ) -> str:
         return _format_result(
@@ -695,7 +696,7 @@ def get_async_quercle_tools(
     async def _extract(
         url: str,
         query: str,
-        format: str | None = None,
+        format: ExtractBodyFormat | None = None,
         use_safeguard: bool | None = None,
     ) -> str:
         return _format_result(
